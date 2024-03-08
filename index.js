@@ -17,22 +17,21 @@ const ExcerciseModel = Mongoose.model(
     username: String,
     description: String,
     duration: Number,
-    date: Date,
+    date: String,
   })
 );
 const UserModel = Mongoose.model(
   "User",
   new Mongoose.Schema({
     username: String,
-    count: Number,
-    log: [{ description: String, duration: Number, date: Date }],
   })
 );
 const LogModel = Mongoose.model(
   "Log",
   new Mongoose.Schema({
-    url: String,
-    short_url: { type: Number, require: true },
+    username: String,
+    count: Number,
+    log: [{ description: String, duration: Number, date: String }],
   })
 );
 app.use(cors());
@@ -44,6 +43,19 @@ app.get("/", (req, res) => {
 app.get("/api/users", function (req, res) {
   UserModel.find({})
     .then((data) => res.json(data))
+    .catch((e) => res.send("error"));
+});
+
+app.get("/api/users/:_id/logs", function (req, res) {
+  UserModel.findById(req.params._id)
+    .then((data) => {
+      res.json({
+        _id: data._id,
+        username: data.username,
+        log: data.log || [],
+        count: 100,
+      });
+    })
     .catch((e) => res.send("error"));
 });
 
@@ -71,11 +83,11 @@ app.post("/api/users/:_id/exercises", function (req, res) {
         .save()
         .then((data) =>
           res.json({
+            _id: req.params._id,
             username: data.username,
-            description: data.description,
-            duration: data.duration,
             date: data.date,
-            _id: data._id,
+            duration: data.duration,
+            description: data.description,
           })
         )
         .catch((e) => {
