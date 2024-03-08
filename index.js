@@ -26,6 +26,7 @@ const UserModel = Mongoose.model(
     username: String,
   })
 );
+
 const LogModel = Mongoose.model(
   "Log",
   new Mongoose.Schema({
